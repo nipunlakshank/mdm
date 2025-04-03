@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Brands;
+use App\Livewire\Categories;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -9,9 +11,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('brands', Brands::class)->name('brands');
+    Route::get('categories', Categories::class)->name('categories');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
