@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Category::class)->nullable()->constrained()->nullOnDelete();
             $table->string('code')->unique();
             $table->string('name');
-            $table->text('attachment');
+            $table->text('attachment')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

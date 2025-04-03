@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Brand;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +18,16 @@ class ItemFactory extends Factory
      */
     public function definition(): array
     {
+        $categories = Category::all();
+        $brands = Brand::all();
+
         return [
-            //
+            'code' => $this->faker->unique()->word(),
+            'name' => $this->faker->word(),
+            'attachment' => $this->faker->imageUrl(),
+            'is_active' => $this->faker->boolean(75),
+            'category_id' => $categories->random()->id,
+            'brand_id' => $brands->random()->id,
         ];
     }
 }
