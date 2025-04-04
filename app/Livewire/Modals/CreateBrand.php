@@ -7,11 +7,11 @@ use Livewire\Component;
 
 class CreateBrand extends Component
 {
-    public ?string $name = '';
-    public ?string $code = '';
-    public ?string $status = '';
+    public string $name = '';
+    public string $code = '';
+    public string $status = '1';
 
-    public function updateOrSave()
+    public function create()
     {
         $this->validate([
             'name' => 'required|string|max:255',
@@ -25,6 +25,9 @@ class CreateBrand extends Component
             'is_active' => $this->status === '1',
         ]);
 
+        $this->reset(['name', 'code', 'status']);
+
+        $this->dispatch('brandCreated');
         $this->dispatch('closeBrandModal');
     }
 

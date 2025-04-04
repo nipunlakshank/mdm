@@ -10,6 +10,12 @@ class Brands extends Component
 {
     use WithPagination;
 
+    protected $listeners = [
+        'brandUpdated' => '$refresh',
+        'brandCreated' => '$refresh',
+        'brandDeleted' => '$refresh',
+    ];
+
     public function render()
     {
         return view('livewire.brands', [

@@ -9,20 +9,20 @@ use Livewire\Component;
 
 class Items extends Component
 {
-    public function getCategory(int $id)
+    public function getCategory(?int $id): ?string
     {
-        return Category::find($id, ['name'])->name;
+        return Category::find($id, ['name'])?->name;
     }
 
-    public function getBrand(int $id)
+    public function getBrand(?int $id): ?string
     {
-        return Brand::find($id, ['name'])->name;
+        return Brand::find($id, ['name'])?->name;
     }
 
     public function render()
     {
         return view('livewire.items', [
-            'items' => Item::query()->paginate(5)
+            'items' => Item::query()->paginate(5),
         ]);
     }
 }

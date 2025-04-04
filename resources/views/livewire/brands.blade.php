@@ -1,40 +1,52 @@
-<div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+<div x-data="{
+    createModal: null,
+    editModal: null,
+    deleteModal: null,
+}" x-init="() => {
+    const createBrandModal = document.getElementById('create-brand-modal');
+    const editBrandModal = document.getElementById('edit-brand-modal');
+    const deleteBrandModal = document.getElementById('delete-brand-modal');
+
+    const options = {
+        backdrop: 'dynamic',
+        backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
+        closable: true,
+    };
+
+    const createInstanceOptions = {
+        id: 'create-brand-modal',
+        override: true
+    };
+    const editInstanceOptions = {
+        id: 'edit-brand-modal',
+        override: true
+    };
+    const deleteInstanceOptions = {
+        id: 'delete-brand-modal',
+        override: true
+    };
+
+    createModal = new Modal(createBrandModal, options, createInstanceOptions)
+    editModal = new Modal(editBrandModal, options, editInstanceOptions)
+    deleteModal = new Modal(deleteBrandModal, options, deleteInstanceOptions)
+
+    document.addEventListener('closeBrandModal', () => {
+        createModal.hide()
+        editModal.hide()
+        deleteModal.hide()
+    })
+}" class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+
+    @livewire('modals.create-brand')
+    @livewire('modals.edit-brand')
+    @livewire('modals.delete-brand')
+
     <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
 
-        <div x-data="{ createModal: null, editModal: null }" class="flex w-full gap-4 p-4" x-init="() => {
-            document.addEventListener('closeBrandModal', () => createModal.hide())
-        }">
-
-            @livewire('modals.create-brand')
-
-            @livewire('modals.edit-brand')
-
+        <div class="flex w-full gap-4 p-4">
             <button
                 class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                x-init="() => {
-                    const createBrandModal = document.getElementById('create-brand-modal');
-                    const editBrandModal = document.getElementById('edit-brand-modal');
-                
-                    const options = {
-                        backdrop: 'dynamic',
-                        backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
-                        closable: true,
-                    };
-                
-                    const createInstanceOptions = {
-                        id: 'create-brand-modal',
-                        override: true
-                    };
-                    const editInstanceOptions = {
-                        id: 'edit-brand-modal',
-                        override: true
-                    };
-                
-                    createModal = new Modal(createBrandModal, options, createInstanceOptions)
-                    editModal = new Modal(editBrandModal, options, editInstanceOptions)
-                
-                    document.addEventListener('closeCreateBrandModal', () => createModal.hide())
-                }" x-on:click="() => createModal.show()" type="button">
+                x-on:click="() => createModal.show()" type="button">
                 New Brand
             </button>
         </div>
@@ -74,9 +86,7 @@
                 </thead>
                 <tbody>
                     @foreach ($brands as $brand)
-                        <tr x-data="{
-                            isActive: @js($brand->is_active)
-                        }"
+                        <tr
                             class="bg-white border-b dark:bg-gray-800/20 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
                             <th scope="row"
                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -86,12 +96,12 @@
                                 {{ $brand->code }}
                             </td>
                             <td class="px-6 py-4"
-                                x-bind:class="{ 'text-green-400': isActive, 'text-red-400': !isActive }">
+                                x-bind:class="{ 'text-green-400': @js($brand->is_active), 'text-red-400': @js(!$brand->is_active) }">
                                 {{ $brand->is_active ? 'Active' : 'Inactive' }}
                             </td>
                             <td x-data="{ optionsDropdown: null }" class="px-6 py-4" x-init="() => {
-                                const targetEl = $refs.optionsDropdown
-                                const triggerEl = $refs.optionsButton
+                                const targetEl = document.getElementById('options-dropdown-{{ $brand->id }}')
+                                const triggerEl = document.getElementById('options-button-{{ $brand->id }}')
                             
                                 const options = {
                                     placement: 'bottom-start',
@@ -128,7 +138,9 @@
                                         <li>
                                             <button title="Edit"
                                                 x-on:click="() => {
+                                                    optionsDropdown.hide()
                                                     $wire.dispatch('editBrand', {brandId: @js($brand->id)})
+                                                    editModal.show()
                                                 }"
                                                 class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                 Edit
@@ -136,6 +148,11 @@
                                         </li>
                                         <li>
                                             <button title="Delete"
+                                                x-on:click="() => {
+                                                    optionsDropdown.hide()
+                                                    $wire.dispatch('deleteBrand', {brandId: @js($brand->id)})
+                                                    deleteModal.show()
+                                                }"
                                                 class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                 Delete
                                             </button>

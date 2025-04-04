@@ -9,7 +9,7 @@ use Livewire\Component;
 class EditBrand extends Component
 {
     public ?Brand $brand;
-    public int $id;
+    public ?int $brandId;
     public ?string $name = '';
     public ?string $code = '';
     public ?string $status = '';
@@ -18,16 +18,31 @@ class EditBrand extends Component
     public function editBrand(int $brandId)
     {
         $this->brand = Brand::findOrFail($brandId);
-        $this->id = $this->brand->id;
+        $this->brandId = $brandId;
         $this->name = $this->brand->name;
         $this->code = $this->brand->code;
         $this->status = $this->brand->is_active ? '1' : '0';
-        $this->dispatch('showModal')->self();
     }
 
-    public function mount()
+    public function update()
     {
+        $this->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:255',
+            'status' => 'required|in:1,0',
+        ]);
+
+        $this->brand->update([
+            'name' => $this->name,
+            'code' => $this->code,
+            'is_active' => $this->status === '1',
+        ]);
+
         $this->brand = null;
+        $this->reset(['brandId', 'name', 'code', 'status']);
+
+        $this->dispatch('brandUpdated');
+        $this->dispatch('closeBrandModal');
     }
 
     public function render()
