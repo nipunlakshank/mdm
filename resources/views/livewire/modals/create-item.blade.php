@@ -1,4 +1,4 @@
-<div id="create-brand-modal" tabindex="-1" aria-hidden="true" wire:ignore
+<div id="create-item-modal" tabindex="-1" aria-hidden="true" wire:ignore
     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <!-- Modal content -->
@@ -7,11 +7,11 @@
             <div
                 class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Create New Brand
+                    Create New Item
                 </h3>
-                <button type="button" x-on:click="$dispatch('closeBrandModal')"
+                <button type="button" x-on:click="$dispatch('closeItemModal')"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                    data-modal-toggle="create-brand-modal">
+                    data-modal-toggle="create-item-modal">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -28,19 +28,60 @@
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
                         <input type="text" name="name" id="name" wire:model="name"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="Type brand name" required="">
+                            placeholder="Type product name" required="">
                     </div>
                     <div class="col-span-2 sm:col-span-1">
-                        <label for="price"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Code</label>
-                        <input type="text" name="code" id="code" wire:model="code"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="Brand Code" required="">
+                        <label for="brand"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Brand</label>
+                        <select id="brand" wire:model="brandId"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+
+                            <option value="">-- No brand --</option>
+
+                            @foreach ($brands as $brand)
+                                @if ($brandId === $brand->id)
+                                    <option selected value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                @else
+                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                @endif
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-span-2 sm:col-span-1">
                         <label for="category"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+                        <select id="category" wire:model="categoryId"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+
+                            <option value="">-- No Category --</option>
+
+                            @foreach ($categories as $category)
+                                @if ($categoryId === $category->id)
+                                    <option selected value="{{ $category->id }}">{{ $category->name }}</option>
+                                @else
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label for="attachment"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image</label>
+                        <input type="file" accept="image/*" name="attachment" id="attachment" wire:model="attachment"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            placeholder="Image for item">
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <label for="code"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Code</label>
+                        <input type="text" name="code" id="code" wire:model="code"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            placeholder="Item Code" required="">
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <label for="status"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
-                        <select id="category" wire:model="status"
+                        <select id="status" wire:model="status"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                             <option value="1" selected>Active</option>
                             <option value="0">Inactive</option>
@@ -55,7 +96,7 @@
                             d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                             clip-rule="evenodd"></path>
                     </svg>
-                    {{ __('Add') }}
+                    Add new product
                 </button>
             </form>
         </div>

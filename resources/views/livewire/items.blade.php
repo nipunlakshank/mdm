@@ -1,31 +1,55 @@
-<div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+<div x-data="{
+    createModal: null,
+    editModal: null,
+    deleteModal: null,
+}" x-init="() => {
+    const createItemModal = document.getElementById('create-item-modal');
+    const editItemModal = document.getElementById('edit-item-modal');
+    const deleteConfirmationModal = document.getElementById('delete-confirmation-modal');
+
+    const options = {
+        backdrop: 'dynamic',
+        backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
+        closable: true,
+    };
+
+    const createInstanceOptions = {
+        id: 'create-item-modal',
+        override: true
+    };
+    const editInstanceOptions = {
+        id: 'edit-item-modal',
+        override: true
+    };
+    const deleteInstanceOptions = {
+        id: 'delete-confirmation-modal',
+        override: true
+    };
+
+    createModal = new Modal(createItemModal, options, createInstanceOptions)
+    editModal = new Modal(editItemModal, options, editInstanceOptions)
+    deleteModal = new Modal(deleteConfirmationModal, options, deleteInstanceOptions)
+
+    document.addEventListener('closeItemModal', () => {
+        createModal.hide()
+        editModal.hide()
+    })
+    document.addEventListener('closeDeleteModal', () => {
+        deleteModal.hide()
+    })
+}" class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+
+    @livewire('modals.create-item')
+    @livewire('modals.edit-item')
+    @livewire('modals.delete-confirmation')
+
     <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
         <div class="relative overflow-x-auto shadow-sm sm:rounded-lg">
 
-            <div x-data="{ itemModal: null }" class="flex w-full gap-4 p-4" x-init="() => {
-                document.addEventListener('closeItemModal', () => itemModal.hide())
-            }">
-
-                @livewire('modals.form-item')
-
+            <div class="flex w-full gap-4 p-4">
                 <button
                     class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    x-init="() => {
-                        const targetEl = document.getElementById('form-item-modal');
-                    
-                        const options = {
-                            backdrop: 'dynamic',
-                            backdropClasses: 'bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40',
-                            closable: true,
-                        };
-                    
-                        const instanceOptions = {
-                            id: 'form-item-modal',
-                            override: true
-                        };
-                    
-                        itemModal = new Modal(targetEl, options, instanceOptions)
-                    }" x-on:click="() => itemModal.show()" type="button">
+                    x-on:click="() => createModal.show()" type="button">
                     New Item
                 </button>
             </div>
@@ -53,6 +77,9 @@
                             name
                         </th>
                         <th scope="col" class="px-6 py-3">
+                            image
+                        </th>
+                        <th scope="col" class="px-6 py-3">
                             Code
                         </th>
                         <th scope="col" class="px-6 py-3">
@@ -70,30 +97,45 @@
                 </thead>
                 <tbody>
                     @foreach ($items as $item)
-                        <tr x-data="{
-                            isActive: @js($item->is_active)
-                        }"
+                        <tr
                             class="bg-white border-b dark:bg-gray-800/20 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
                             <th scope="row"
                                 class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 {{ $item->name }}
                             </th>
+                            <th scope="row"
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                @if (!empty($item->attachment))
+                                    <img src="{{ $item->attachment }}" alt="{{ $item->name }}"
+                                        class="w-10 h-10 rounded-lg">
+                                @else
+                                    <span class="text-gray-500 italic font-thin">Null</span>
+                                @endif
+                            </th>
                             <td class="px-6 py-4">
                                 {{ $item->code }}
                             </td>
                             <td class="px-6 py-4">
-                                {{ $this->getBrand($item->brand_id) }}
+                                @if (!empty($item->brand_id))
+                                    {{ $this->getBrand($item->brand_id) }}
+                                @else
+                                    <span class="text-gray-500 italic font-thin">Null</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
-                                {{ $this->getCategory($item->category_id) }}
+                                @if (!empty($item->category_id))
+                                    {{ $this->getCategory($item->category_id) }}
+                                @else
+                                    <span class="text-gray-500 italic font-thin">Null</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4"
-                                x-bind:class="{ 'text-green-400': isActive, 'text-red-400': !isActive }">
+                                x-bind:class="{ 'text-green-400': @js($item->is_active), 'text-red-400': @js(!$item->is_active) }">
                                 {{ $item->is_active ? 'Active' : 'Inactive' }}
                             </td>
                             <td x-data="{ optionsDropdown: null }" class="px-6 py-4" x-init="() => {
-                                const targetEl = $refs.optionsDropdown
-                                const triggerEl = $refs.optionsButton
+                                const targetEl = document.getElementById('options-dropdown-{{ $item->id }}')
+                                const triggerEl = document.getElementById('options-button-{{ $item->id }}')
                             
                                 const options = {
                                     placement: 'bottom-start',
@@ -128,12 +170,22 @@
                                         aria-labelledby="options-button-{{ $item->id }}">
                                         <li>
                                             <button title="Edit"
+                                                x-on:click="() => {
+                                                    optionsDropdown.hide()
+                                                    $wire.dispatch('editItem', {itemId: @js($item->id)})
+                                                    editModal.show()
+                                                }"
                                                 class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                 Edit
                                             </button>
                                         </li>
                                         <li>
                                             <button title="Delete"
+                                                x-on:click="() => {
+                                                    optionsDropdown.hide()
+                                                    $wire.dispatch('deleteModel', { modelId: @js($item->id), modelClass: 'App\\Models\\Item' })
+                                                    deleteModal.show()
+                                                }"
                                                 class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                                 Delete
                                             </button>

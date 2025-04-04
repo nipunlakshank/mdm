@@ -11,9 +11,9 @@ class Brands extends Component
     use WithPagination;
 
     protected $listeners = [
-        'brandUpdated' => '$refresh',
         'brandCreated' => '$refresh',
-        'brandDeleted' => '$refresh',
+        'brandUpdated' => '$refresh',
+        'modelDeleted' => '$refresh',
     ];
 
     public function render()

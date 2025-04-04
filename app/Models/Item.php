@@ -16,9 +16,9 @@ class Item extends Model
         'description',
         'category_id',
         'brand_id',
+        'attachment',
         'is_active',
     ];
-
     protected $casts = [
         'is_active' => 'boolean',
     ];

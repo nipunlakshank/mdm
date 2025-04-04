@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Modals;
 
-use App\Models\Brand;
+use App\Models\Category;
 use Livewire\Component;
 
-class CreateBrand extends Component
+class CreateCategory extends Component
 {
     public string $name = '';
     public string $code = '';
@@ -19,7 +19,7 @@ class CreateBrand extends Component
             'status' => 'required|in:1,0',
         ]);
 
-        Brand::create([
+        Category::create([
             'name' => $this->name,
             'code' => $this->code,
             'is_active' => $this->status === '1',
@@ -27,12 +27,12 @@ class CreateBrand extends Component
 
         $this->reset(['name', 'code', 'status']);
 
-        $this->dispatch('brandCreated');
-        $this->dispatch('closeBrandModal');
+        $this->dispatch('categoryCreated');
+        $this->dispatch('closeCategoryModal');
     }
 
     public function render()
     {
-        return view('livewire.modals.create-brand');
+        return view('livewire.modals.create-category');
     }
 }

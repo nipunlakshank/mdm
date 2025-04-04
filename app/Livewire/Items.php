@@ -6,9 +6,18 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Item;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Items extends Component
 {
+    use WithPagination;
+
+    protected $listeners = [
+        'itemCreated' => '$refresh',
+        'itemUpdated' => '$refresh',
+        'modelDeleted' => '$refresh',
+    ];
+
     public function getCategory(?int $id): ?string
     {
         return Category::find($id, ['name'])?->name;
@@ -22,7 +31,7 @@ class Items extends Component
     public function render()
     {
         return view('livewire.items', [
-            'items' => Item::query()->paginate(5),
+            'items' => Item::paginate(5),
         ]);
     }
 }

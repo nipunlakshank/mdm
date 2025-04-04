@@ -5,7 +5,7 @@
 }" x-init="() => {
     const createBrandModal = document.getElementById('create-brand-modal');
     const editBrandModal = document.getElementById('edit-brand-modal');
-    const deleteBrandModal = document.getElementById('delete-brand-modal');
+    const deleteConfirmationModal = document.getElementById('delete-confirmation-modal');
 
     const options = {
         backdrop: 'dynamic',
@@ -22,24 +22,26 @@
         override: true
     };
     const deleteInstanceOptions = {
-        id: 'delete-brand-modal',
+        id: 'delete-confirmation-modal',
         override: true
     };
 
     createModal = new Modal(createBrandModal, options, createInstanceOptions)
     editModal = new Modal(editBrandModal, options, editInstanceOptions)
-    deleteModal = new Modal(deleteBrandModal, options, deleteInstanceOptions)
+    deleteModal = new Modal(deleteConfirmationModal, options, deleteInstanceOptions)
 
     document.addEventListener('closeBrandModal', () => {
         createModal.hide()
         editModal.hide()
+    })
+    document.addEventListener('closeDeleteModal', () => {
         deleteModal.hide()
     })
 }" class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
 
     @livewire('modals.create-brand')
     @livewire('modals.edit-brand')
-    @livewire('modals.delete-brand')
+    @livewire('modals.delete-confirmation')
 
     <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
 
@@ -150,7 +152,7 @@
                                             <button title="Delete"
                                                 x-on:click="() => {
                                                     optionsDropdown.hide()
-                                                    $wire.dispatch('deleteBrand', {brandId: @js($brand->id)})
+                                                    $wire.dispatch('deleteModel', { modelId: @js($brand->id), modelClass: 'App\\Models\\Brand' })
                                                     deleteModal.show()
                                                 }"
                                                 class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
